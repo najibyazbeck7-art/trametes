@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Batch - Mushroom Lab</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .nav {
+            background: #34495e;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .nav a:hover {
+            background: #2c3e50;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .stage-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .stage-flow {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .stage {
+            text-align: center;
+            padding: 10px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        .stage-delay {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍄 Create New Batch</h1>
+        </div>
+        
+        <div class="nav">
+            <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+        </div>
+
+        <div class="stage-info">
+            <h3>📋 Production Pipeline Stages</h3>
+            <div class="stage-flow">
+                <div class="stage">
+                    <strong>Culture</strong>
+                    <div class="stage-delay">7 days</div>
+                </div>
+                <div class="stage">
+                    <strong>LC</strong>
+                    <div class="stage-delay">7 days</div>
+                </div>
+                <div class="stage">
+                    <strong>Spawn</strong>
+                    <div class="stage-delay">14 days</div>
+                </div>
+                <div class="stage">
+                    <strong>Blocks</strong>
+                    <div class="stage-delay">18 days</div>
+                </div>
+                <div class="stage">
+                    <strong>Harvest</strong>
+                    <div class="stage-delay">Ready!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="name">Batch Name</label>
+                    <input type="text" id="name" name="name" required placeholder="e.g., Oyster Mushroom Batch #001">
+                </div>
+                
+                <button type="submit" class="btn">Create Batch</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

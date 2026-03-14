@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline Status - Mushroom Lab</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .nav {
+            background: #34495e;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .nav a:hover {
+            background: #2c3e50;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .pipeline-row {
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f2f8fd;
+        }
+        .batch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .batch-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .batch-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .stage-flow {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        .stage {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 0 2px;
+            font-size: 12px;
+        }
+        .stage.completed {
+            background: #d5f4e6;
+            border: 2px solid #27ae60;
+            color: #27ae60;
+        }
+        .stage.current {
+            background: #fef9e7;
+            border: 2px solid #f39c12;
+            color: #f39c12;
+        }
+        .stage.pending {
+            background: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            color: #7f8c8d;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .pending-tasks {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .no-tasks {
+            background: #27ae60;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍄 Pipeline Status Overview</h1>
+        </div>
+        
+        <div class="nav">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('new_batch') }}">New Batch</a>
+            <a href="{{ url_for('pipeline_status') }}">Pipeline Status</a>
+        </div>
+
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ pipeline_data|length }}</div>
+                <div class="stat-label">Total Batches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ pipeline_data|selectattr('pending_tasks', 'equalto', 0)|list|length }}</div>
+                <div class="stat-label">Batches Up to Date</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ pipeline_data|selectattr('pending_tasks', 'greaterthan', 0)|list|sum(attribute='pending_tasks') }}</div>
+                <div class="stat-label">Pending Tasks</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 All Batches Pipeline View</h3>
+            {% if pipeline_data %}
+                {% for item in pipeline_data %}
+                    <div class="pipeline-row">
+                        <div class="batch-header">
+                            <div>
+                                <div class="batch-name">{{ item.batch.name }}</div>
+                                <div class="batch-meta">
+                                    Created: {{ item.batch.created_at.strftime('%Y-%m-%d') }} | 
+                                    Current: {{ item.batch.current_stage.title() }}
+                                </div>
+                            </div>
+                            <div>
+                                {% if item.pending_tasks > 0 %}
+                                    <span class="pending-tasks">{{ item.pending_tasks }} pending</span>
+                                {% else %}
+                                    <span class="no-tasks">Up to date</span>
+                                {% endif %}
+                                <a href="{{ url_for('view_batch', batch_id=item.batch.id) }}" class="btn">View Details</a>
+                            </div>
+                        </div>
+                        
+                        <div class="stage-flow">
+                            <div class="stage {% if 'culture' in item.stages_completed %}completed{% elif item.batch.current_stage == 'culture' %}current{% else %}pending{% endif %}">
+                                <strong>Culture</strong><br>7 days
+                            </div>
+                            <div class="stage {% if 'lc' in item.stages_completed %}completed{% elif item.batch.current_stage == 'lc' %}current{% else %}pending{% endif %}">
+                                <strong>LC</strong><br>7 days
+                            </div>
+                            <div class="stage {% if 'spawn' in item.stages_completed %}completed{% elif item.batch.current_stage == 'spawn' %}current{% else %}pending{% endif %}">
+                                <strong>Spawn</strong><br>14 days
+                            </div>
+                            <div class="stage {% if 'blocks' in item.stages_completed %}completed{% elif item.batch.current_stage == 'blocks' %}current{% else %}pending{% endif %}">
+                                <strong>Blocks</strong><br>18 days
+                            </div>
+                            <div class="stage {% if 'harvest' in item.stages_completed %}completed{% else %}pending{% endif %}">
+                                <strong>Harvest</strong><br>Ready!
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No batches in the pipeline yet. <a href="{{ url_for('new_batch') }}">Create your first batch!</a></p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
